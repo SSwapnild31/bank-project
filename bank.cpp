@@ -1,45 +1,70 @@
 #include<iostream>
 #include<string>
+#include<limits>
 
-namespace bnk{
+namespace bnk
+{
+	enum class acc_type{ saving = 1, current };
+	
 	struct bank_column{
 		int acc_no;
 		std::string name;
 		double balance;
+		acc_type type;
 	};
-	
-	enum acc_type{ saving, current };
 
-	class bank{
+	class bank
+	{
 		public:
 			virtual void insert_info() = 0;
 			virtual void create_acc() = 0;
 			virtual void delete_acc() = 0;
 			virtual void update_acc() = 0;
 			virtual void search_acc() = 0;
+			virtual void display() = 0;
 			virtual void display_all_acc() = 0;
-
+			
 			virtual ~bank() {}
 	};
 	
-	class user : public bank{
+	class user : public bank
+	{
 		public:
 			void insert_info() {
 				std::cout <<"insert info\n";
 
-				struct bank_column bk;
-				acc_type at;
+				struct bank_column acc;
 				
 				std::cout <<"Enter name : ";
-				getline(std::cin, bk.name);
+				getline(std::cin, acc.name);
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				std::cout <<"Enter balance : ";
+				std::cin >> acc.balance;
 				
-				std::cout <<"Deposit balance : ";
-				std::cin >> bk.balance;
+				int type;
+				std::cout <<"1.saving\t2.current\nEnter Acc type : ";
+				std::cin >> type;
+
+				if(type == 1)
+					acc.type = acc_type::saving;
+				else
+					acc.type = acc_type::current;
 				
-				std::cout <<"Acc type saving/current(1) : ";
+				std::cout <<"Account created successfully\n";
+				std::cout <<"-------------------------------"<< std::endl;
+			}
+
+			void display(){
+				std::cout <<"-----------USER DATA-----------"<< std::endl;
+				std::cout <<"Acc name    : "<< name << std::endl;
+				std::cout <<"Acc number  : "<< acc_no << std::endl;
+				std::cout <<"Acc type    : "<< type << std::endl;
+				std::cout <<"Acc balance : "<< balance << std::endl;
+				std::cout <<"-------------------------------"<< std::endl;
 			}
 			void create_acc() {
-				std::cout <<"create acc\n";
+				std::cout <<"create acc, ";
+				insert_info();
 			}
 			void delete_acc() {
 				std::cout <<"delete acc\n";
@@ -55,7 +80,7 @@ namespace bnk{
 			}
 	};
 };
-
+ 
 int main()
 {
 	bnk::user obj;

@@ -8,36 +8,28 @@ namespace bnk
 	
 	struct bank_column{
 		int acc_no;
-		std::string name;
+		char name[50];
 		double balance;
 		acc_type type;
 	};
 
-	class bank
-	{
+	class bank_op{
 		public:
-			virtual void read_data() = 0;
-			virtual void create_acc() = 0;
-			virtual void delete_acc() = 0;
-			virtual void update_acc() = 0;
 			virtual void search_acc() = 0;
-			//virtual void display() = 0;
-			virtual void display_all_acc() = 0;
-			
-			virtual ~bank() {}
+			virtual void check_balance() = 0;
+			virtual ~bank_op() {}
 	};
 
-	class admin : public bank
+	class admin : public bank_op
 	{
 		public:
-			void read_data() {
+			bank_column read_data() {
 				std::cout <<"insert data\n";
+				bank_column acc;
 
-				struct bank_column acc;
-				
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				std::cout <<"Enter name : ";
-				getline(std::cin, acc.name);
+				std::cin.getline(acc.name, 49);
 				
 				std::cout <<"Enter balance : ";
 				std::cin >> acc.balance;
@@ -50,6 +42,14 @@ namespace bnk
 					acc.type = acc_type::saving;
 				else	
 					acc.type = acc_type::current;
+
+				return acc;
+			}
+			
+			void write_data(bank_column bc){
+				std::fstream fo("bank.txt",std::ios::out | std::ios::app);
+				fo.write((char*)&bc, sizeof(bc));
+				fo.close();
 			}
 
 			/*void display(){
@@ -60,6 +60,7 @@ namespace bnk
 				std::cout <<"Acc balance : "<< balance << std::endl;
 				std::cout <<"-------------------------------"<< std::endl;
 			}*/
+
 			void create_acc() {
 				std::cout <<"create acc, ";
 				read_data();
@@ -80,7 +81,10 @@ namespace bnk
 				std::cout <<"Enter acc number : ";
 				std::cin >> number;
 			}
-			void search_acc() {
+			void check_balance() override {
+				std::cout <<"check balance\n";
+			}
+			void search_acc() override {
 				std::cout <<"Search acc\n";
 				
 				int number;
@@ -93,23 +97,28 @@ namespace bnk
 			}
 	};
 
-	class user : public bank
+	class user : public bank_op
 	{
 		public: 
-			void send_money(){
+			void send_money() {
+				
+			}
+			void deposit_money() {
+				
+			}
+			void check_balance() override {
+				
+			}
+			void search_acc() override {
 
 			}
-			void deposit_money(){
-
-			}
-			
 	};
 };
 
 int main()
 {
 	bnk::admin adm;
-	bnk::user usr;
+	//bnk::user usr;
 
 	std::cout <<"-------------------------------"<< std::endl;
 	std::cout <<"            WELCOME            "<< std::endl;

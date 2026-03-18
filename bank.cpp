@@ -18,6 +18,7 @@ namespace bnk
 		public:
 			virtual void search_acc() = 0;
 			virtual void check_balance() = 0;
+			virtual void display(bank_column) = 0;
 			virtual ~bank_op() {}
 	};
 
@@ -36,35 +37,22 @@ namespace bnk
 				std::ifstream file("bank.dat",std::ios::binary);
 				file.read((char*)&bc, sizeof(bc));
 				file.close();
-
 				return bc;
 			}
 			
-			void display(bank_column bc){
-				//std::cout <<"-----------USER DATA-----------"<< std::endl;
-				std::cout <<"-------------------------------"<< std::endl;
-				std::cout <<"Acc name    : "<< bc.name << std::endl;
-				std::cout <<"Acc number  : "<< bc.acc_no << std::endl;
-				std::cout <<"Acc balance : "<< bc.balance << std::endl;
-				if(bc.type == acc_type::saving)
-					std::cout <<"Acc type    : Saving\n";
-				else
-					std::cout <<"Acc type    : Current\n";
-			}
-			
 			void create_acc() {
-				std::cout <<"create account\n";
+				std::cout <<" Creating Account\n";
 				bank_column acc;
 
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-				std::cout <<"Enter name : ";
+				std::cout <<" Enter name : ";
 				std::cin.getline(acc.name, 49);
 				
-				std::cout <<"Enter balance : ";
+				std::cout <<" Enter balance : ₹.";
 				std::cin >> acc.balance;
 				
 				int type;
-				std::cout <<"1.saving\t2.current\nEnter Acc type : ";
+				std::cout <<" 1.saving\t2.current\n Enter Acc type : ";
 				std::cin >> type;
 
 				if(type == 1)	
@@ -74,87 +62,178 @@ namespace bnk
 				
 				write_data(acc);
 
-				std::cout <<"Account created successfully\n";
+				std::cout <<" Account created successfully\n";
 			}
-			void delete_acc() {
-				std::cout <<"Delete account\n";
-				
-				int number;
-				std::cout <<"Enter acc number : ";
-				std::cin >> number;
-				
-			}
-			void update_acc() {
-				std::cout <<"Update acc\n";
-				
-				int number;
-				std::cout <<"Enter acc number : ";
-				std::cin >> number;
-			}
-			void check_balance() override {
-				std::cout <<"check balance\n";
 
-			}
-			void search_acc() override {
-				std::cout <<"Search acc\n";
+			void delete_acc() {
+				std::cout <<" Deleting account\n";
 				
 				int number;
-				std::cout <<"Enter acc number : ";
+				std::cout <<" Enter acc number : ";
+				std::cin >> number;
+				
+			}
+
+			void update_acc() {
+				std::cout <<" Updating account\n";
+				
+				int number;
+				std::cout <<" Enter acc number : ";
 				std::cin >> number;
 			}
+
+			void search_acc() override {
+				bank_column bc;
+				long int acn;
+				std::cout <<" Enter Acc no : ";
+				std::cin >> acn;
+				
+				std::ifstream file("bank.dat",std::ios::binary);
+
+				while(file.read((char*)&bc, sizeof(bc))){
+					if(bc.acc_no == acn){
+						std::cout <<" Record Found ->\n";
+						display(bc);
+
+						file.close();
+						return;
+					}
+				}
+				
+				std::cout <<" Acc not present/wrong number!\n";
+			}
+
+			void check_balance() override {
+				bank_column bc;
+				long int acn;
+				
+				std::cout <<" Enter Acc no : ";
+				std::cin >> acn;
+				
+				std::ifstream file("bank.dat",std::ios::binary);
+				while(file.read((char*)&bc, sizeof(bc))){
+					if(bc.acc_no == acn){
+						std::cout <<" Acc Balance ->\n";
+						std::cout <<" ..........................\n";
+						std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
+						std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
+						
+						file.close();
+						return;
+					}
+				}
+				
+				std::cout <<" Acc not present/wrong number!\n";
+			}
+			
 			void display_all_acc() {	
 				bank_column bc;
 				
 				std::ifstream file("bank.dat",std::ios::binary);
-
-				std::cout <<"----------ALL ACCOUNTS---------\n";
-				while(file.read((char*)&bc,sizeof(bc))){
-					/*std::cout <<"Acc No   : "<<bc.acc_no << std::endl;;
-					std::cout <<"Name     : "<<bc.name << std::endl;;
-					std::cout <<"Balance  : "<<bc.balance << std::endl;;
-					if(bc.type == acc_type::saving)
-						std::cout <<"Acc type : Saving\n";
-					else
-						std::cout <<"Acc type : Current\n";*/
+				
+				std::cout <<" All Records -> \n";
+					
+				while( file.read((char*)&bc,sizeof(bc)) ){
 					display(bc);
 				}
 				
 				file.close();
 			}
+
+			void display(bank_column bc){
+				std::cout <<" ..........................\n";	
+				std::cout <<" User name   : "<< bc.name << std::endl;
+				std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
+				std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
+				if(bc.type == acc_type::saving)
+					std::cout <<" Acc type    : Saving\n";
+				else
+					std::cout <<" Acc type    : Current\n";
+			}
 	};
 
 	class user : public bank_op
 	{
-		public: 
+		public: 	
 			void send_money() {
-				std::cout <<"---------TRANSFER MONEY--------\n";
+				std::cout <<" Transfer Money ->\n";
 				long int acn1, acn2, bal;
 
-				std::cout <<"Enter Sender Acc no   : ";
+				std::cout <<" Enter Sender Acc no   : ";
 				std::cin >> acn1;
-				std::cout <<"Enter Receiver Acc no : ";
+				std::cout <<" Enter Receiver Acc no : ";
 				std::cin >> acn2;
-				std::cout <<"Enter Amount to send  : ";
+				std::cout <<" Enter Amount to send  : ₹.";
 				std::cin >> bal;
-				std::cout <<"-------------------------------\n";	
+				//std::cout <<"-------------------------------\n";	
 			}
+			
 			void deposit_money() {
-				std::cout <<"----------DEPOSIT MONEY--------\n";
+				std::cout <<" Deposit Money ->\n";
 				long int acn1, acn2, bal;
 
-				std::cout <<"Enter Sender Acc no   : ";
+				std::cout <<" Enter Sender Acc no   : ";
 				std::cin >> acn1;
-				std::cout <<"Enter Receiver Acc no : ";
+				std::cout <<" Enter Receiver Acc no : ";
 				std::cin >> acn2;
-				std::cout <<"Enter Amount to send  : ";
+				std::cout <<" Enter Amount to send  : ₹.";
 				std::cin >> bal;
-				std::cout <<"-------------------------------\n";		
+				//std::cout <<"-------------------------------\n";		
 			}
-			void check_balance() override {
-				
-			}
-			void search_acc() override {
 
+			void check_balance() override {
+				bank_column bc;
+				long int acn;
+				
+				std::cout <<" Enter Acc no : ";
+				std::cin >> acn;
+				
+				std::ifstream file("bank.dat",std::ios::binary);
+
+				while(file.read((char*)&bc, sizeof(bc))){
+					if(bc.acc_no == acn){
+						std::cout <<" Acc Balance ->\n";
+						std::cout <<" ..........................\n";
+						std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
+						std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
+						
+						file.close();
+						return;
+					}
+				}
+				
+				std::cout <<" Acc not present/wrong number!\n";
+			}
+			
+			void search_acc() override {
+				bank_column bc;
+				long int acn;
+				
+				std::cout <<" Enter Acc no : ";
+				std::cin >> acn;
+				
+				std::ifstream file("bank.dat",std::ios::binary);
+				while(file.read((char*)&bc, sizeof(bc))){
+					if(bc.acc_no == acn){
+						std::cout <<" Record Found ->\n";
+						display(bc);
+						file.close();
+						return;
+					}
+				}
+				
+				std::cout <<" Acc not present/wrong number!\n";
+			}
+
+			void display(bank_column bc){
+				std::cout <<" ..........................\n";
+				std::cout <<" User name   : "<< bc.name << std::endl;
+				std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
+				std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
+				if(bc.type == acc_type::saving)
+					std::cout <<" Acc type    : Saving\n";
+				else
+					std::cout <<" Acc type    : Current\n";
 			}
 	};
 };
@@ -165,13 +244,13 @@ int main()
 	bnk::user usr;
 
 	std::cout <<"-------------------------------"<< std::endl;
-	std::cout <<"            WELCOME            "<< std::endl;
+	std::cout <<"          | WELCOME |          "<< std::endl;
+	std::cout <<"-------------------------------"<< std::endl;
 
 
 	while(true){	
 		int ch;
-		std::cout <<"-------------------------------"<< std::endl;
-		std::cout <<" 1.ADMIN  2.USER  3.EXIT\n";
+		std::cout <<"    1.Admin  2.User  3.Exit\n";
 		std::cout <<"-------------------------------"<< std::endl;
 		std::cout <<" Enter option : ";
 		std::cin >> ch;
@@ -181,21 +260,21 @@ int main()
 				while(true){
 					int op;
 					std::cout <<"-------------------------------"<< std::endl;
-					std::cout <<" 1.Create Acc\t2.Update Acc\n 3.Search Acc\t4.Delete Acc\n 5.Display all\t6.Main menu\n";
+					std::cout <<" 1.Create Record\t2.Update Record\n 3.Search Record\t4.Delete Record\n 5.Check balalance\t6.Display Records\n 7.Main menu\n";
 					std::cout <<"-------------------------------"<< std::endl;
 					std::cout <<" Enter option : ";
 					std::cin >> op;
 					std::cout <<"-------------------------------"<< std::endl;
 
-					if(op == 6) break;
+					if(op == 7) break;
 
-					switch(op)
-					{
+					switch(op){
 						case 1 : adm.create_acc();	break;
 						case 2 : adm.update_acc();	break;
 						case 3 : adm.search_acc();	break;
 						case 4 : adm.delete_acc();	break;
-						case 5 : adm.display_all_acc();	break;
+						case 5 : adm.check_balance();	break;
+						case 6 : adm.display_all_acc();	break;
 						default: std::cout <<" wrong option! Enter again!\n";
 					}
 				}	
@@ -209,24 +288,24 @@ int main()
 					std::cout <<" Enter option : ";
 					std::cin >> op;
 					std::cout <<"-------------------------------"<< std::endl;
-
+					
 					if(op == 5) break;
-
+					
 					switch(op){
 						case 1 : usr.search_acc();	break;
 						case 2 : usr.check_balance();	break;
 						case 3 : usr.send_money();	break;
 						case 4 : usr.deposit_money();	break;
-						default: std::cout <<" wrong option! Enter again";
+						default: std::cout <<" wrong option! Enter again\n";
 					}
 				}
 				break;
-			case 3 : exit(0);
+			case 3 : 
+				 std::cout <<"-------------------------------"<< std::endl;
+				 std::cout <<"         | THANK YOU |         "<< std::endl;
+				 std::cout <<"-------------------------------"<< std::endl;
+				 exit(0);
 			default: std::cout <<" wrong option! Enter again!\n";
 		}
 	}
 }
-
-
-
-

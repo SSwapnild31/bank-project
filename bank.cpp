@@ -130,12 +130,12 @@ namespace bnk
 				std::cout <<"---------TRANSFER MONEY--------\n";
 				long int acn1, acn2, bal;
 
-				cout <<"Enter Sender Acc no   : ";
-				cin >> acn1;
-				cout <<"Enter Receiver Acc no : ";
-				cin >> acn2;
-				cout <<"Enter Amount to send  : ";
-				cin >> bal;
+				std::cout <<"Enter Sender Acc no   : ";
+				std::cin >> acn1;
+				std::cout <<"Enter Receiver Acc no : ";
+				std::cin >> acn2;
+				std::cout <<"Enter Amount to send  : ";
+				std::cin >> bal;
 				std::cout <<"-------------------------------\n";	
 			}
 			void deposit_money() {

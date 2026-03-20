@@ -25,37 +25,53 @@ namespace bnk
 	class admin : public bank_op
 	{
 		private:
-			char m_user[50];
-			char m_pass[50];
+			std::string m_user;
+			std::string m_pass;
 		public:	
 			bool login_admin(){
-				char user[50];
-				char pass[50];
+				std::string user;
+				std::string pass;
 
-				auto read_lambda = [user, pass](){
+				auto read_lambda = [](std::string &u, std::string &p){
 					std::cout <<" Enter Username : ";
-					std::cin >> user;
+					getline(std::cin, u);
 				
 					std::cout <<" Enter Password : ";
-					std::cin >> pass;
-				}
+					getline(std::cin,p);
+				};
 
-				std::fstream file("pass.dat",std::ios::in | std::ios::out | std::ios::binary);
+				std::ifstream file("pass.dat");
 				
+				//If file doesn't exit -> create it
 				if(!file){
-					read_lambda();
-					file.read((char*)&m_user, sizeof(m_user));
-					file.read((char*)&m_pass, sizeof(m_pass));
+					std::cout <<"-------------------------------\n";
+					
+					std::cout <<" Set username & password\n";
+					
+					read_lambda(m_user, m_pass);
+					
+					std::ofstream("pass.dat") << m_user << "\n" << m_pass;
+					
+					std::cout <<" Details saved successfully\n\n";
+					std::cout <<" Enter Admin details to login\n";
+					std::cout <<"-------------------------------\n";
 				}
-
 				
 				file.close();
+
+				//Read from file
+				std::ifstream f1("pass.dat");
 				
-				if(strcmp(m_user, user) == 0  && strcmp(m_pass, pass) == 0){
-					return true;
-				}
-				return false;
+				getline(f1, m_user);
+				getline(f1, m_pass);
+				
+				f1.close();
+				
+				read_lambda(user, pass);
+				
+				return (m_user == user  && m_pass == pass);
 			}
+
 			void write_data(bank_column bc){
 				std::ofstream file("record.dat",std::ios::binary | std::ios::app);
 				file.write((char*)&bc, sizeof(bc));
@@ -67,7 +83,7 @@ namespace bnk
 				
 				std::ifstream file("record.dat",std::ios::binary);
 
-				/*if(file == 0){
+				/*if(!file){
 					std::cout <<" File not present\n";
 					return ; 
 				}*/
@@ -152,7 +168,7 @@ namespace bnk
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
 						std::cout <<" Acc Balance ->\n";
-						std::cout <<" ..........................\n";
+						std::cout <<" .............................\n";
 						std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
 						std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
 						
@@ -196,7 +212,7 @@ namespace bnk
 			}
 
 			void display(bank_column bc){
-				std::cout <<" ..........................\n";	
+				std::cout <<" .............................\n";	
 				std::cout <<" User name   : "<< bc.name << std::endl;
 				std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
 				std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
@@ -248,7 +264,7 @@ namespace bnk
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
 						std::cout <<" Acc Balance ->\n";
-						std::cout <<" ..........................\n";
+						std::cout <<" .............................\n";
 						std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
 						std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
 						
@@ -287,7 +303,7 @@ namespace bnk
 			}
 
 			void display(bank_column bc){
-				std::cout <<" ..........................\n";
+				std::cout <<" .............................\n";
 				std::cout <<" User name   : "<< bc.name << std::endl;
 				std::cout <<" Acc number  : "<< bc.acc_no << std::endl;
 				std::cout <<" Acc balance : "<< bc.balance <<" ₹."<< std::endl;
@@ -310,49 +326,50 @@ int main()
 
 
 	while(true){	
-		int ch, atempt = 0;
+		int ch, attempt = 0;
 		std::cout <<"    1.Admin  2.User  3.Exit\n";
 		std::cout <<"-------------------------------\n";
 		std::cout <<" Enter option : ";
 		std::cin >> ch;
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		switch(ch){
 			case 1 :
-				login:
-				if(adm.login_admin()){
-					std::cout <<"-------------------------------\n";
-					std::cout <<"           Logged In           \n";
-					while(true){
-						
-						int op, c;
+				login :
+					if(adm.login_admin()){
 						std::cout <<"-------------------------------\n";
-						std::cout <<" 1.Create Acc\t2.Update Acc\n 3.Search Acc\t4.Delete Acc\n 5.Check bal\t6.Display Accs\n 7.Count Accs\t8.Main menu\n";
-						std::cout <<"-------------------------------\n";
-						std::cout <<" Enter option : ";
-						std::cin >> op;
-						std::cout <<"-------------------------------\n";
+						std::cout <<"           Logged In           \n";
+						while(true){
+							
+							int op, c;
+							std::cout <<"-------------------------------\n";
+							std::cout <<" 1.Create Acc\t2.Update Acc\n 3.Search Acc\t4.Delete Acc\n 5.Check bal\t6.Display Accs\n 7.Count Accs\t8.Main menu\n";
+							std::cout <<"-------------------------------\n";
+							std::cout <<" Enter option : ";
+							std::cin >> op;
+							std::cout <<"-------------------------------\n";
 
-						if(op == 8) break;
+							if(op == 8) break;
 
-						switch(op){
-							case 1 : adm.create_acc();		break;
-							case 2 : adm.update_acc();		break;
-							case 3 : adm.search_acc();		break;
-							case 4 : adm.delete_acc();		break;
-							case 5 : adm.check_balance();	break;
-							case 6 : adm.display_records();	break;
-							case 7 : c = adm.record_count();
-									 std::cout <<" Total records : "<< c << std::endl;	break;
-							default: std::cout <<" wrong option! Enter again!\n";
-						}
-					}	
-				}
-				else{
+							switch(op){
+								case 1 : adm.create_acc();		break;
+								case 2 : adm.update_acc();		break;
+								case 3 : adm.search_acc();		break;
+								case 4 : adm.delete_acc();		break;
+								case 5 : adm.check_balance();	break;
+								case 6 : adm.display_records();	break;
+								case 7 : c = adm.record_count();
+										 std::cout <<" Total records : "<< c << std::endl;	break;
+								default: std::cout <<" wrong option! Enter again!\n";
+							}
+						}	
+					}
+					else{
 						std::cout <<" wrong username/password!\n\n";
-						atempt++;
-						if(atempt < 3)
+						attempt++;
+						if(attempt < 3)
 							goto login;
-				}
+					}
 				break;
 			case 2 :
 				while(true){

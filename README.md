@@ -1,7 +1,7 @@
 # Bank-Management-System (C++)
 
 ## ➡️ Description
-+ A Bank Management System built using C++, demonstrating concepts like OOP, file handling, and and basic authentication.
++ A Bank Management System built using C++, demonstrating concepts like OOP, file handling, and and basic username and password authentication for login as admin.
 
 ## 📌 Features
 + Admin : __Login System (username & password)__

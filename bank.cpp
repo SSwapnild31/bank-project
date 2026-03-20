@@ -32,15 +32,23 @@ namespace bnk
 				char user[50];
 				char pass[50];
 
-				std::cout <<" Enter Username : ";
-				std::cin >> user;
-
-				std::cout <<" Enter Password : ";
-				std::cin >> pass;	
+				auto read_lambda = [user, pass](){
+					std::cout <<" Enter Username : ";
+					std::cin >> user;
 				
-				std::ifstream file("pass",std::ios::binary);
-				file.read((char*)&m_user, sizeof(m_user));
-				file.read((char*)&m_pass, sizeof(m_pass));
+					std::cout <<" Enter Password : ";
+					std::cin >> pass;
+				}
+
+				std::fstream file("pass.dat",std::ios::in | std::ios::out | std::ios::binary);
+				
+				if(!file){
+					read_lambda();
+					file.read((char*)&m_user, sizeof(m_user));
+					file.read((char*)&m_pass, sizeof(m_pass));
+				}
+
+				
 				file.close();
 				
 				if(strcmp(m_user, user) == 0  && strcmp(m_pass, pass) == 0){
@@ -49,7 +57,7 @@ namespace bnk
 				return false;
 			}
 			void write_data(bank_column bc){
-				std::ofstream file("bank.dat",std::ios::binary | std::ios::app);
+				std::ofstream file("record.dat",std::ios::binary | std::ios::app);
 				file.write((char*)&bc, sizeof(bc));
 				file.close();
 			}
@@ -57,7 +65,13 @@ namespace bnk
 			bank_column read_data(){
 				bank_column bc;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
+				std::ifstream file("record.dat",std::ios::binary);
+
+				/*if(file == 0){
+					std::cout <<" File not present\n";
+					return ; 
+				}*/
+
 				file.read((char*)&bc, sizeof(bc));
 				file.close();
 				return bc;
@@ -66,7 +80,8 @@ namespace bnk
 			void create_acc() {
 				std::cout <<" Creating Account\n";
 				bank_column acc;
-
+				
+				acc.acc_no = record_count() + 1;
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				std::cout <<" Enter name : ";
 				std::cin.getline(acc.name, 49);
@@ -111,7 +126,7 @@ namespace bnk
 				std::cout <<" Enter Acc no : ";
 				std::cin >> acn;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
+				std::ifstream file("record.dat",std::ios::binary);
 
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
@@ -133,7 +148,7 @@ namespace bnk
 				std::cout <<" Enter Acc no : ";
 				std::cin >> acn;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
+				std::ifstream file("record.dat",std::ios::binary);
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
 						std::cout <<" Acc Balance ->\n";
@@ -152,8 +167,11 @@ namespace bnk
 			void display_records() {	
 				bank_column bc;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
-				
+				std::ifstream file("record.dat",std::ios::binary);
+				if(!file){
+					std::cout <<" Error in opening file/not present\n";
+					return;
+				}
 				std::cout <<" All Records -> \n";
 					
 				while( file.read((char*)&bc,sizeof(bc)) ){
@@ -168,7 +186,7 @@ namespace bnk
 				int count = 0;
 				bank_column bc;
 
-				std::ifstream file("bank.dat",std::ios::binary);					
+				std::ifstream file("record.dat",std::ios::binary);					
 				while(file.read((char*)&bc,sizeof(bc))){
 					count++;
 				}
@@ -225,7 +243,7 @@ namespace bnk
 				std::cout <<" Enter Acc no : ";
 				std::cin >> acn;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
+				std::ifstream file("record.dat",std::ios::binary);
 
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
@@ -249,7 +267,13 @@ namespace bnk
 				std::cout <<" Enter Acc no : ";
 				std::cin >> acn;
 				
-				std::ifstream file("bank.dat",std::ios::binary);
+				std::ifstream file("record.dat",std::ios::binary);
+
+				if(!file){
+					std::cout <<"Error in opening file/not present\n";
+					return;
+				}
+
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
 						std::cout <<" Record Found ->\n";
@@ -302,7 +326,7 @@ int main()
 						
 						int op, c;
 						std::cout <<"-------------------------------\n";
-						std::cout <<" 1.Create Record\t2.Update Record\n 3.Search Record\t4.Delete Record\n 5.Check balalance\t6.Display Records\n 7.Record count\t8.Main menu\n";
+						std::cout <<" 1.Create Acc\t2.Update Acc\n 3.Search Acc\t4.Delete Acc\n 5.Check bal\t6.Display Accs\n 7.Count Accs\t8.Main menu\n";
 						std::cout <<"-------------------------------\n";
 						std::cout <<" Enter option : ";
 						std::cin >> op;

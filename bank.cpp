@@ -75,20 +75,25 @@ namespace bnk
 			void write_data(bank_column bc){
 				std::ofstream file("record.dat",std::ios::binary | std::ios::app);
 				file.write((char*)&bc, sizeof(bc));
+				
 				file.close();
 			}
 			
 			bank_column read_data(){
-				bank_column bc;
+				bank_column bc{};
 				
 				std::ifstream file("record.dat",std::ios::binary);
 
-				/*if(!file){
+				if(!file){
 					std::cout <<" File not present\n";
-					return ; 
-				}*/
+					return bc; 
+				}
 
-				file.read((char*)&bc, sizeof(bc));
+				if(file.read((char*)&bc, sizeof(bc))){
+					std::cout <<" Error reading file\n";
+					return bank_column{};
+				}
+
 				file.close();
 				return bc;
 			}
@@ -165,6 +170,12 @@ namespace bnk
 				std::cin >> acn;
 				
 				std::ifstream file("record.dat",std::ios::binary);
+
+				if(!file){
+					std::cout <<" Error in opening file/not present\n";
+					return;
+				}
+
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
 						std::cout <<" Acc Balance ->\n";
@@ -184,12 +195,13 @@ namespace bnk
 				bank_column bc;
 				
 				std::ifstream file("record.dat",std::ios::binary);
+				
 				if(!file){
 					std::cout <<" Error in opening file/not present\n";
 					return;
 				}
-				std::cout <<" All Records -> \n";
-					
+				
+				std::cout <<" All Records : \n";	
 				while( file.read((char*)&bc,sizeof(bc)) ){
 					display(bc);
 				}
@@ -260,6 +272,11 @@ namespace bnk
 				std::cin >> acn;
 				
 				std::ifstream file("record.dat",std::ios::binary);
+				
+				if(!file){
+					std::cout <<"Error: opening file/not present\n";
+					return;
+				}
 
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
@@ -286,7 +303,7 @@ namespace bnk
 				std::ifstream file("record.dat",std::ios::binary);
 
 				if(!file){
-					std::cout <<"Error in opening file/not present\n";
+					std::cout <<"Error: opening file/not present\n";
 					return;
 				}
 
@@ -331,14 +348,16 @@ int main()
 		std::cout <<"-------------------------------\n";
 		std::cout <<" Enter option : ";
 		std::cin >> ch;
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');		//To remove extra remaining \n
 
 		switch(ch){
 			case 1 :
 				login :
 					if(adm.login_admin()){
+						
 						std::cout <<"-------------------------------\n";
 						std::cout <<"           Logged In           \n";
+						
 						while(true){
 							
 							int op, c;

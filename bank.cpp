@@ -25,12 +25,10 @@ namespace bnk
 	class admin : public bank_op
 	{
 		private:
-			std::string m_user;
-			std::string m_pass;
+			std::string m_user, m_pass;
 		public:	
 			bool login_admin(){
-				std::string user;
-				std::string pass;
+				std::string user, pass;
 
 				auto read_lambda = [](std::string &u, std::string &p){
 					std::cout <<" Enter Username : ";
@@ -74,6 +72,12 @@ namespace bnk
 
 			void write_data(bank_column bc){
 				std::ofstream file("record.dat",std::ios::binary | std::ios::app);
+				
+				if(!file){
+					std::cout <<" Error : opening file\n";
+					return;
+				}
+
 				file.write((char*)&bc, sizeof(bc));
 				
 				file.close();
@@ -148,6 +152,11 @@ namespace bnk
 				std::cin >> acn;
 				
 				std::ifstream file("record.dat",std::ios::binary);
+				
+				if(!file){
+					std::cout <<" Error : reading file\n";
+					return;
+				}
 
 				while(file.read((char*)&bc, sizeof(bc))){
 					if(bc.acc_no == acn){
@@ -353,6 +362,10 @@ int main()
 		switch(ch){
 			case 1 :
 				login :
+					if(attempt == 2){
+						std::cout <<" Warning: Last attempt remaining!\n";
+						std::cout <<"-------------------------------\n";
+					}
 					if(adm.login_admin()){
 						
 						std::cout <<"-------------------------------\n";
@@ -386,8 +399,13 @@ int main()
 					else{
 						std::cout <<" wrong username/password!\n\n";
 						attempt++;
-						if(attempt < 3)
-							goto login;
+						if(attempt < 3)	goto login;
+
+						std::cout <<"-------------------------------\n";
+						std::cout <<" Access blocked : \n"; 
+						std::cout <<"     Too many failed attempts! \n";
+						std::cout <<"-------------------------------\n";
+						return 1;
 					}
 				break;
 			case 2 :
@@ -419,4 +437,6 @@ int main()
 			default: std::cout <<" wrong option! Enter again!\n";
 		}
 	}
+	
+	return 0;
 }

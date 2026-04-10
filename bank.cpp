@@ -350,7 +350,6 @@ int main()
 	std::cout <<"          | WELCOME |          \n";
 	std::cout <<"-------------------------------\n";
 
-
 	while(true){	
 		int ch, attempt = 0;
 		std::cout <<"    1.Admin  2.User  3.Exit\n";
@@ -363,7 +362,7 @@ int main()
 			case 1 :
 				login :
 					if(attempt == 2){
-						std::cout <<" Warning: Last attempt remaining!\n";
+						std::cout <<" \nWarning: Last attempt remaining!\n";
 						std::cout <<"-------------------------------\n";
 					}
 					if(adm.login_admin()){
